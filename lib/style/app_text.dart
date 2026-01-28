@@ -11,9 +11,17 @@ enum FontFamily {
 class FontScale {
   const FontScale();
 
-  static double get h1 => 20.sp;
-  static double get body => 16.sp;
-  static double get caption => 14.sp;
+  // Headings
+  static double get h1 => 24.sp; // Page title
+  static double get h2 => 20.sp; // Section title
+  static double get h3 => 18.sp; // Card title
+
+  // Body
+  static double get body => 16.sp; // Default text
+  static double get bodySmall => 14.sp;
+
+  // Supporting
+  static double get overline => 10.sp;
 }
 
 class AppFonts {
@@ -47,6 +55,7 @@ class AppTextStyles {
       family: font,
       size: FontScale.h1,
       height: 1.5,
+      weight: FontWeight.bold,
       color: c.textPrimary,
     );
   }
@@ -63,6 +72,19 @@ class AppTextStyles {
     );
   }
 
+  static TextStyle bodyBold(
+    BuildContext context, {
+    FontFamily font = FontFamily.urbanist,
+  }) {
+    final c = AppColors.of(context);
+    return AppFonts.base(
+      family: font,
+      size: FontScale.body,
+      color: c.textPrimary,
+      weight: FontWeight.bold,
+    );
+  }
+
   static TextStyle caption(
     BuildContext context, {
     FontFamily font = FontFamily.urbanist,
@@ -70,8 +92,46 @@ class AppTextStyles {
     final c = AppColors.of(context);
     return AppFonts.base(
       family: font,
-      size: FontScale.caption,
+      size: FontScale.body,
+      color: c.textPrimary,
+    );
+  }
+
+  static TextStyle errorText(
+    BuildContext context, {
+    FontFamily font = FontFamily.urbanist,
+  }) {
+    final c = AppColors.of(context);
+    return AppFonts.base(
+      family: font,
+      size: FontScale.bodySmall,
+      color: c.error,
+      weight: FontWeight.bold
+    );
+  }
+
+  static TextStyle textHint(
+    BuildContext context, {
+    FontFamily font = FontFamily.urbanist,
+  }) {
+    final c = AppColors.of(context);
+    return AppFonts.base(
+      family: font,
+      size: FontScale.body,
+      color: c.placeholderColor,
+    );
+  }
+
+  static TextStyle textButton(
+    BuildContext context, {
+    FontFamily font = FontFamily.urbanist,
+  }) {
+    final c = AppColors.of(context);
+    return AppFonts.base(
+      family: font,
+      size: FontScale.body,
       color: c.textSecondary,
+      weight: FontWeight.bold
     );
   }
 }
