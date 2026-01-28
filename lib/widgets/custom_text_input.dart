@@ -9,6 +9,7 @@ class CustomTextInput extends StatefulWidget {
   final IconData? icon;
   final bool isPassword;
   final TextInputType keyboardType;
+  // final String? Function(String?)? validator;
 
   const CustomTextInput({
     super.key,
@@ -19,6 +20,7 @@ class CustomTextInput extends StatefulWidget {
     this.icon,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
+    // this.validator,
   });
 
   @override
@@ -66,7 +68,8 @@ class _CustomTextInputState extends State<CustomTextInput> {
             child: Stack(
               alignment: Alignment.centerLeft,
               children: [
-                TextField(
+                TextFormField(
+                  // validator: widget.validator,
                   controller: widget.controller,
                   obscureText: widget.isPassword ? _obscure : false,
                   keyboardType: widget.keyboardType,

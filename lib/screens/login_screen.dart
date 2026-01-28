@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
+import 'package:wanderly/screens/home_screen.dart';
+import 'package:wanderly/screens/register_screen.dart';
 import 'package:wanderly/style/app_text.dart';
 import 'package:wanderly/widgets/custom_text_input.dart';
+import 'package:wanderly/widgets/link_button.dart';
 import 'package:wanderly/widgets/or_divider.dart';
 import 'package:wanderly/widgets/primary_button.dart';
 import 'package:wanderly/widgets/social_auth_button.dart';
@@ -19,10 +23,39 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final usernameEmailController = TextEditingController();
-  final String emailError = "";
+  String emailError = "";
 
   final passwordController = TextEditingController();
-  final String passwordError = "";
+  String passwordError = "";
+
+  bool formValidate() {
+    setState(() {
+      passwordError = "";
+      emailError = "";
+    });
+    if (usernameEmailController.text.isEmpty) {
+      setState(() {
+        emailError = "Email is required";
+      });
+      return false;
+    }
+    if (!usernameEmailController.text.contains('@')) {
+      setState(() {
+        emailError = "Please use email format";
+      });
+      return false;
+    }
+    setState(() {
+      emailError = "";
+    });
+    if (passwordController.text.isEmpty) {
+      setState(() {
+        passwordError = "Password is required";
+      });
+      return false;
+    }
+    return true;
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -31,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 2.w, horizontal: 4.w),
           child: Column(
-            // crossAxisAlignment: CrossAxisAlignment.center,
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: Adaptive.sh(4),),
               ClipRRect(
@@ -55,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     CustomTextInput(
-                      label: 'Email or Username',
+                      label: 'Email',
                       hint: 'e.g. wanderer@travel.com',
                       controller: usernameEmailController,
                       icon: Icons.person_outline,
@@ -74,7 +107,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     PrimaryButton(
                       label: 'Login', 
                       icon: Icons.arrow_forward,
-                      onPressed: () {}
+                      onPressed: () {
+                        if (formValidate()) {
+                          setState(() {
+                            emailError = '';
+                            passwordError = '';
+                          });
+                          context.go(HomeScreen.routeName);
+                        }
+                      }
                     ),
                     SizedBox(height: Adaptive.sh(2),),
                   ],
@@ -85,11 +126,24 @@ class _LoginScreenState extends State<LoginScreen> {
               SocialAuthButton(
                 label: 'Sign in with Google',
                 svgAsset: 'assets/google.svg',
-                onPressed: () {
-                  print('Google login');
-                },
+                onPressed: () {},
               ),
-
+              SizedBox(height: Adaptive.sh(2),),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Don\'t have account? ',
+                    style: AppTextStyles.body(context),
+                  ),
+                  LinkButton(
+                    text: "Register Now", 
+                    onPressed: () {
+                      context.push(RegisterScreen.routeName);
+                    }
+                  )
+                ],
+              )
             ],
           ),
         )
