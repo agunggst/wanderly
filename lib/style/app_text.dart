@@ -60,6 +60,20 @@ class AppTextStyles {
     );
   }
 
+  static TextStyle sectionHeading(
+    BuildContext context, {
+    FontFamily font = FontFamily.urbanist,
+  }) {
+    final c = AppColors.of(context);
+    return AppFonts.base(
+      family: font,
+      size: FontScale.h2,
+      height: 1.5,
+      weight: FontWeight.bold,
+      color: c.textPrimary,
+    );
+  }
+
   static TextStyle body(
     BuildContext context, {
     FontFamily font = FontFamily.urbanist,
