@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wanderly/style/app_colors.dart';
+import 'package:wanderly/core/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wanderly/core/theme_provider.dart';
+import 'package:wanderly/core/theme/theme_provider.dart';
 
 class CustomAppBar extends ConsumerWidget
     implements PreferredSizeWidget {

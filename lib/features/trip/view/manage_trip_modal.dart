@@ -1,10 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:wanderly/data/trip_model.dart';
+import 'package:wanderly/features/trip/data/trip_model.dart';
 import 'package:wanderly/helper/date_range_to_string_formatter.dart';
 import 'package:wanderly/helper/parse_date_range.dart';
-import 'package:wanderly/style/app_colors.dart';
-import 'package:wanderly/style/app_text.dart';
+import 'package:wanderly/core/theme/app_colors.dart';
+import 'package:wanderly/core/theme/app_text.dart';
 
 class AddTripModal extends StatefulWidget {
   final Trip? trip;

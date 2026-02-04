@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 // import 'package:wanderly/data/trip_dummy.dart';
-import 'package:wanderly/data/trip_model.dart';
-import 'package:wanderly/modals/add_trip_modal.dart';
-import 'package:wanderly/style/app_colors.dart';
-import 'package:wanderly/style/app_text.dart';
-import 'package:wanderly/widgets/custom_app_bar.dart';
-import 'package:wanderly/widgets/custom_text_input.dart';
-import 'package:wanderly/widgets/trip_card.dart';
+import 'package:wanderly/features/trip/data/trip_model.dart';
+import 'package:wanderly/features/trip/view/manage_trip_modal.dart';
+import 'package:wanderly/core/theme/app_colors.dart';
+import 'package:wanderly/core/theme/app_text.dart';
+import 'package:wanderly/shared/widgets/custom_app_bar.dart';
+import 'package:wanderly/shared/widgets/custom_text_input.dart';
+import 'package:wanderly/features/trip/widgets/trip_card.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/';

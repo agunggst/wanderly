@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sizer/sizer.dart';
-import 'package:wanderly/core/router.dart';
-import 'package:wanderly/core/theme_provider.dart';
-import 'package:wanderly/style/app_colors.dart';
+import 'package:wanderly/core/router/router.dart';
+import 'package:wanderly/core/theme/app_theme.dart';
+import 'package:wanderly/core/theme/theme_provider.dart';
+import 'package:wanderly/core/theme/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,16 +29,8 @@ class MyApp extends ConsumerWidget {
         return MaterialApp.router(
           routerConfig: appRouter,
           themeMode: themeMode,
-          theme: ThemeData(
-            scaffoldBackgroundColor: AppColors.light.background,
-            brightness: Brightness.light, 
-            useMaterial3: true
-          ),
-          darkTheme: ThemeData(
-            scaffoldBackgroundColor: AppColors.dark.background,
-            brightness: Brightness.dark, 
-            useMaterial3: true
-          ),
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
         );
       }
     );

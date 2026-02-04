@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wanderly/style/app_text.dart';
+import 'package:wanderly/core/theme/app_text.dart';
 
 class LinkButton extends StatelessWidget {
   final String text;

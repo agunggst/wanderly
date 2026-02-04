@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wanderly/style/app_colors.dart';
-import 'package:wanderly/style/app_text.dart';
+import 'package:wanderly/core/theme/app_colors.dart';
+import 'package:wanderly/core/theme/app_text.dart';
 
 class PrimaryButton extends StatefulWidget {
   final String label;

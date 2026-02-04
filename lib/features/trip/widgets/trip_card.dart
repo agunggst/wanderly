@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wanderly/data/trip_model.dart';
+import 'package:wanderly/features/trip/data/trip_model.dart';
 // import 'package:wanderly/screens/home_screen.dart';
 
 class TripCard extends StatelessWidget {
