@@ -5,7 +5,6 @@ import 'package:sizer/sizer.dart';
 import 'package:wanderly/core/router/router.dart';
 import 'package:wanderly/core/theme/app_theme.dart';
 import 'package:wanderly/core/theme/theme_provider.dart';
-import 'package:wanderly/core/theme/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
