@@ -56,8 +56,7 @@ class CustomAppBar extends ConsumerWidget
                 minHeight: 40,
               ),
               onPressed: () {
-                ref.read(themeModeProvider.notifier).state =
-                    isDark ? ThemeMode.light : ThemeMode.dark;
+                ref.read(themeModeProvider.notifier).toggle();
               },
             ),
           ),
