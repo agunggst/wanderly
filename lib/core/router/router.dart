@@ -27,15 +27,3 @@ final routerProvider = Provider<GoRouter>((ref) {
     ]
   );
 },);
-
-// final appRouter = GoRouter(
-//   initialLocation: LoginScreen.routeName,
-//   redirect: (context, state) {
-    
-//   },
-//   routes: [
-//     GoRoute(path: HomeScreen.routeName, builder: (_, _) => const HomeScreen()),
-//     GoRoute(path: LoginScreen.routeName, builder: (_, _) => const LoginScreen()),
-//     GoRoute(path: RegisterScreen.routeName, builder: (_, _) => const RegisterScreen()),
-//   ]
-// );
