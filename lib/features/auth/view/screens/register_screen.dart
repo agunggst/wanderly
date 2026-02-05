@@ -1,25 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sizer/sizer.dart';
-import 'package:wanderly/features/trip/view/home_screen.dart';
-import 'package:wanderly/features/auth/view/login_screen.dart';
+
+import 'package:wanderly/features/trip/view/screens/home_screen.dart';
+import 'package:wanderly/features/auth/view/screens/login_screen.dart';
+import 'package:wanderly/features/auth/provider/auth_provider.dart';
+
 import 'package:wanderly/core/theme/app_text.dart';
+import 'package:wanderly/features/user/data/user_model.dart';
+import 'package:wanderly/features/user/provider/user_provider.dart';
 import 'package:wanderly/shared/widgets/custom_text_input.dart';
 import 'package:wanderly/shared/widgets/link_button.dart';
 import 'package:wanderly/shared/widgets/or_divider.dart';
 import 'package:wanderly/shared/widgets/primary_button.dart';
-import 'package:wanderly/features/auth/widgets/social_auth_button.dart';
+import 'package:wanderly/features/auth/view/widgets/social_auth_button.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   static const routeName = "/register";
-  
+
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final nameController = TextEditingController();
@@ -32,42 +38,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String passwordError = "";
 
   bool formValidate() {
-    setState(() {
-      nameError = "";
-      passwordError = "";
-      emailError = "";
-    });
+    nameError = "";
+    emailError = "";
+    passwordError = "";
+
     if (nameController.text.isEmpty) {
-      setState(() {
-        nameError = "Name is required";
-      });
+      nameError = "Name is required";
       return false;
     }
-    setState(() {
-      nameError = "";
-    });
+
     if (emailController.text.isEmpty) {
-      setState(() {
-        emailError = "Email is required";
-      });
+      emailError = "Email is required";
       return false;
     }
+
     if (!emailController.text.contains('@')) {
-      setState(() {
-        emailError = "Please use email format";
-      });
+      emailError = "Please use email format";
       return false;
     }
-    setState(() {
-      emailError = "";
-    });
+
     if (passwordController.text.isEmpty) {
-      setState(() {
-        passwordError = "Password is required";
-      });
+      passwordError = "Password is required";
       return false;
     }
+
     return true;
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -79,28 +82,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: Adaptive.sh(4),),
-              ClipRRect(
-                child: Image.asset(
-                  'assets/wanderly_logo.png',
-                  width: Adaptive.w(30),
-                ),
+              SizedBox(height: Adaptive.sh(4)),
+
+              Image.asset(
+                'assets/wanderly_logo.png',
+                width: Adaptive.w(30),
               ),
-              SizedBox(height: Adaptive.sh(2),),
+
+              SizedBox(height: Adaptive.sh(2)),
+
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Create Account",
-                    style: AppTextStyles.heading(context),
-                  ),
+                  Text("Create Account",
+                      style: AppTextStyles.heading(context)),
                   Text(
                     "Start your next journey with us.",
                     style: AppTextStyles.caption(context),
                   ),
                 ],
               ),
-              SizedBox(height: Adaptive.sh(2),),
+
+              SizedBox(height: Adaptive.sh(2)),
+
               Form(
                 key: _formKey,
                 child: Column(
@@ -112,7 +116,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       icon: Icons.person,
                       errorText: nameError,
                     ),
-                    SizedBox(height: Adaptive.sh(0.5),),
+                    SizedBox(height: Adaptive.sh(0.5)),
+
                     CustomTextInput(
                       label: 'Email',
                       hint: 'e.g. wanderer@travel.com',
@@ -120,7 +125,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       icon: Icons.person_outline,
                       errorText: emailError,
                     ),
-                    SizedBox(height: Adaptive.sh(0.5),),
+                    SizedBox(height: Adaptive.sh(0.5)),
+
                     CustomTextInput(
                       label: 'Password',
                       hint: '************',
@@ -129,32 +135,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       errorText: passwordError,
                       isPassword: true,
                     ),
-                    SizedBox(height: Adaptive.sh(2),),
+
+                    SizedBox(height: Adaptive.sh(2)),
+
                     PrimaryButton(
                       label: 'Create Account',
                       onPressed: () {
-                        if (formValidate()) {
-                          setState(() {
-                            nameError = '';
-                            emailError = '';
-                            passwordError = '';
-                          });
-                          context.go(HomeScreen.routeName);
+                        if (!formValidate()) {
+                          setState(() {});
+                          return;
                         }
-                      }
+
+                        setState(() {});
+
+                        // =========================
+                        // SIMULASI REGISTER SUCCESS
+                        // =========================
+                        const token = "token_from_register";
+
+                        // SET TOKEN KE RIVERPOD
+                        ref.read(authProvider.notifier).login(token);
+
+                        // set user
+                        ref.read(userProvider.notifier).setUser(
+                          User(
+                            email: emailController.text,
+                            password: passwordController.text,
+                            fullName: nameController.text,
+                          ),
+                        );
+
+                        // NAVIGATE KE HOME
+                        context.go(HomeScreen.routeName);
+                      },
                     ),
-                    SizedBox(height: Adaptive.sh(2),),
+
+                    SizedBox(height: Adaptive.sh(2)),
                   ],
-                )
+                ),
               ),
-              const OrDivider(text: 'OR',),
-              SizedBox(height: Adaptive.sh(2),),
+
+              const OrDivider(text: 'OR'),
+              SizedBox(height: Adaptive.sh(2)),
+
               SocialAuthButton(
                 label: 'Sign up with Google',
                 svgAsset: 'assets/google.svg',
                 onPressed: () {},
               ),
-              SizedBox(height: Adaptive.sh(2),),
+
+              SizedBox(height: Adaptive.sh(2)),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -163,16 +194,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: AppTextStyles.body(context),
                   ),
                   LinkButton(
-                    text: "Login", 
+                    text: "Login",
                     onPressed: () {
                       context.push(LoginScreen.routeName);
-                    }
+                    },
                   )
                 ],
               ),
             ],
           ),
-        )
+        ),
       ),
     );
   }

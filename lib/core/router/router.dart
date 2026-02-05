@@ -1,7 +1,7 @@
-import 'package:wanderly/features/trip/view/home_screen.dart';
+import 'package:wanderly/features/trip/view/screens/home_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wanderly/features/auth/view/login_screen.dart';
-import 'package:wanderly/features/auth/view/register_screen.dart';
+import 'package:wanderly/features/auth/view/screens/login_screen.dart';
+import 'package:wanderly/features/auth/view/screens/register_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: LoginScreen.routeName,
