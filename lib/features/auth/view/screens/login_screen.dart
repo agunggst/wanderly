@@ -115,7 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     PrimaryButton(
                       label: 'Login',
                       icon: Icons.arrow_forward,
-                      onPressed: () {
+                      onPressed: () async {
                         if (!formValidate()) {
                           setState(() {});
                           return;
@@ -127,7 +127,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const token = "token_from_server";
 
                         // SET TOKEN KE RIVERPOD
-                        ref.read(authProvider.notifier).login(token);
+                        await ref.read(authProvider.notifier).login(token);
 
                         // SET USER DATA
                         ref.read(userProvider.notifier).setUser(
@@ -137,9 +137,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             fullName: "Guest User", // dari API nanti
                           ),
                         );
-
-                        // NAVIGATE
-                        context.go(HomeScreen.routeName);
                       },
                     ),
 

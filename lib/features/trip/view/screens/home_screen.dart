@@ -6,6 +6,7 @@ import 'package:wanderly/features/trip/data/trip_model.dart';
 import 'package:wanderly/features/trip/view/screens/manage_trip_modal.dart';
 import 'package:wanderly/core/theme/app_colors.dart';
 import 'package:wanderly/core/theme/app_text.dart';
+import 'package:wanderly/shared/widgets/confirmation_dialog.dart';
 import 'package:wanderly/shared/widgets/custom_app_bar.dart';
 import 'package:wanderly/shared/widgets/custom_text_input.dart';
 import 'package:wanderly/features/trip/view/widgets/trip_card.dart';
@@ -16,7 +17,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final trips = ref.watch(tripListProvider);
+    final tripAsync = ref.watch(tripListProvider);
     final c = AppColors.of(context);
     final searchInputController = TextEditingController();
 
@@ -40,25 +41,44 @@ class HomeScreen extends ConsumerWidget {
               ),
               SizedBox(height: Adaptive.sh(1)),
               Expanded(
-                child: ListView.separated(
-                  itemCount: trips.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final trip = trips[index];
+                child: tripAsync.when(
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(child: Text(e.toString())),
+                  data: (trips) {
+                    if (trips.isEmpty) {
+                      return const Center(child: Text("No trips yet"));
+                    }
 
-                    return TripCard(
-                      trip: trip,
-                      onDelete: () {
-                        ref.read(tripListProvider.notifier).deleteTrip(index);
-                      },
-                      onEdit: () {
-                        showAddTripModal(
-                          context,
+                    return ListView.separated(
+                      itemCount: trips.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final trip = trips[index];
+
+                        return TripCard(
                           trip: trip,
-                          onSubmit: (updatedTrip) {
+                          onDelete: () async {
+                            final confirm = await showConfirmDialog(
+                              context,
+                              title: "Delete Trip",
+                              message: "This trip will be permanently deleted.",
+                              confirmText: "Delete",
+                            );
+                            if (!confirm) return;
                             ref
                                 .read(tripListProvider.notifier)
-                                .updateTrip(index, updatedTrip);
+                                .deleteTrip(trip.id);
+                          },
+                          onEdit: () {
+                            showAddTripModal(
+                              context,
+                              trip: trip,
+                              onSubmit: (updatedTrip) {
+                                ref
+                                    .read(tripListProvider.notifier)
+                                    .updateTrip(updatedTrip);
+                              },
+                            );
                           },
                         );
                       },
