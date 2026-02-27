@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sizer/sizer.dart';
 import 'package:wanderly/features/trip/provider/trip_provider.dart';
+import 'package:wanderly/features/trip/provider/filtered_sorted_trips_provider.dart';
+import 'package:wanderly/features/trip/provider/trip_filter_sort_provider.dart';
 import 'package:wanderly/features/trip/data/trip_model.dart';
 import 'package:wanderly/features/trip/view/screens/manage_trip_modal.dart';
 import 'package:wanderly/core/theme/app_colors.dart';
@@ -10,48 +12,158 @@ import 'package:wanderly/shared/widgets/confirmation_dialog.dart';
 import 'package:wanderly/shared/widgets/custom_app_bar.dart';
 import 'package:wanderly/shared/widgets/custom_text_input.dart';
 import 'package:wanderly/features/trip/view/widgets/trip_card.dart';
+import 'package:wanderly/features/trip/view/widgets/trip_filter_sort_widget.dart';
+import 'package:wanderly/features/trip/data/trip_enums.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   static const routeName = '/';
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final tripAsync = ref.watch(tripListProvider);
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  late TextEditingController searchInputController;
+  bool showFilters = true;
+
+  @override
+  void initState() {
+    super.initState();
+    searchInputController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    searchInputController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tripsAsync = ref.watch(filteredSortedTripsProvider);
+    final filterSort = ref.watch(tripFilterSortProvider);
     final c = AppColors.of(context);
-    final searchInputController = TextEditingController();
 
     return Scaffold(
       appBar: CustomAppBar(height: Adaptive.h(8)),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomTextInput(
-                label: "",
-                hint: "Search your adventures...",
-                controller: searchInputController,
+        child: Column(
+          children: [
+            // Search and Filter Toggle
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            //   child: Row(
+            //     children: [
+            //       Expanded(
+            //         child: CustomTextInput(
+            //           label: "",
+            //           hint: "Search your adventures...",
+            //           controller: searchInputController,
+            //           onChanged: (value) {
+            //             ref
+            //                 .read(tripFilterSortProvider.notifier)
+            //                 .setSearchQuery(value);
+            //           },
+            //         ),
+            //       ),
+            //       SizedBox(width: Adaptive.w(2)),
+            //       GestureDetector(
+            //         onTap: () {
+            //           setState(() => showFilters = !showFilters);
+            //         },
+            //         child: Container(
+            //           padding: const EdgeInsets.all(12),
+            //           decoration: BoxDecoration(
+            //             border: Border.all(color: Colors.grey.shade300),
+            //             borderRadius: BorderRadius.circular(12),
+            //           ),
+            //           child: Icon(
+            //             showFilters ? Icons.filter_list : Icons.filter_list_outlined,
+            //             color: c.primary,
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+
+            // Filter and Sort Widget
+            if (showFilters)
+              const TripFilterSortWidget(),
+
+            // Active Filters Display
+            if (filterSort.selectedStatus != null ||
+                filterSort.sortBy != TripSortBy.dateAscending)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    if (filterSort.selectedStatus != null)
+                      Chip(
+                        label: Text(filterSort.selectedStatus!.displayName),
+                        onDeleted: () {
+                          ref
+                              .read(tripFilterSortProvider.notifier)
+                              .setStatusFilter(null);
+                        },
+                      ),
+                    SizedBox(width: Adaptive.w(2)),
+                    if (filterSort.sortBy != TripSortBy.dateAscending)
+                      Chip(
+                        label: Text(filterSort.sortBy.displayName),
+                        onDeleted: () {
+                          ref
+                              .read(tripFilterSortProvider.notifier)
+                              .setSortBy(TripSortBy.dateAscending);
+                        },
+                      ),
+                  ],
+                ),
               ),
-              SizedBox(height: Adaptive.sh(1)),
-              Text(
-                "Upcoming Trips",
-                style: AppTextStyles.sectionHeading(context),
-              ),
-              SizedBox(height: Adaptive.sh(1)),
-              Expanded(
-                child: tripAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
+
+            SizedBox(height: Adaptive.sh(1)),
+
+            // Trips List
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: tripsAsync.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (e, _) => Center(child: Text(e.toString())),
                   data: (trips) {
                     if (trips.isEmpty) {
-                      return const Center(child: Text("No trips yet"));
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.luggage_outlined,
+                              size: 64,
+                              color: Colors.grey.shade400,
+                            ),
+                            SizedBox(height: Adaptive.sh(2)),
+                            Text(
+                              "No trips found",
+                              style: AppTextStyles.bodyBold(context),
+                            ),
+                            SizedBox(height: Adaptive.sh(1)),
+                            Text(
+                              filterSort.selectedStatus != null ||
+                                      filterSort.searchQuery.isNotEmpty
+                                  ? "Try adjusting your filters"
+                                  : "Create your first trip!",
+                              style: AppTextStyles.caption(context),
+                            ),
+                          ],
+                        ),
+                      );
                     }
 
                     return ListView.separated(
                       itemCount: trips.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 12),
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final trip = trips[index];
 
@@ -61,7 +173,8 @@ class HomeScreen extends ConsumerWidget {
                             final confirm = await showConfirmDialog(
                               context,
                               title: "Delete Trip",
-                              message: "This trip will be permanently deleted.",
+                              message:
+                                  "This trip will be permanently deleted.",
                               confirmText: "Delete",
                             );
                             if (!confirm) return;
@@ -86,11 +199,10 @@ class HomeScreen extends ConsumerWidget {
                   },
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-
       bottomNavigationBar: NavigationBar(
         selectedIndex: 0,
         onDestinationSelected: (_) {},
@@ -107,7 +219,6 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () {

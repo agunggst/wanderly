@@ -33,6 +33,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final passwordController = TextEditingController();
   String passwordError = "";
 
+  bool _isLoading = false;
+
   bool formValidate() {
     setState(() {
       passwordError = "";
@@ -112,30 +114,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     SizedBox(height: Adaptive.sh(4)),
 
                     PrimaryButton(
-                      label: 'Login',
+                      label: _isLoading ? 'Logging in...' : 'Login',
                       icon: Icons.arrow_forward,
-                      onPressed: () async {
+                      onPressed: _isLoading ? null : () async {
                         if (!formValidate()) {
                           setState(() {});
                           return;
                         }
 
-                        // =========================
-                        // SIMULASI LOGIN SUCCESS
-                        // =========================
-                        const token = "token_from_server";
+                        setState(() => _isLoading = true);
 
-                        // SET TOKEN KE RIVERPOD
-                        await ref.read(authProvider.notifier).login(token);
-
-                        // SET USER DATA
-                        ref.read(userProvider.notifier).setUser(
-                          User(
+                        try {
+                          // Login with Firebase
+                          await ref.read(authProvider.notifier).login(
                             email: usernameEmailController.text,
                             password: passwordController.text,
-                            fullName: "Guest User", // dari API nanti
-                          ),
-                        );
+                          );
+
+                          // SET USER DATA
+                          ref.read(userProvider.notifier).setUser(
+                            User(
+                              email: usernameEmailController.text,
+                              password: passwordController.text,
+                              fullName: "User",
+                            ),
+                          );
+
+                          // Navigate to home
+                          if (mounted) {
+                            context.go('/');
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(e.toString()),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        } finally {
+                          if (mounted) {
+                            setState(() => _isLoading = false);
+                          }
+                        }
                       },
                     ),
 
@@ -165,6 +187,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   LinkButton(
                     text: "Register Now",
                     onPressed: () {
+                      print("MASUK");
                       context.push(RegisterScreen.routeName);
                     },
                   ),
