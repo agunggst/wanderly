@@ -12,13 +12,23 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: LoginScreen.routeName,
     redirect: (context, state) {
       final token = auth.value;
+
       final isLoginPage = state.matchedLocation == LoginScreen.routeName;
+      final isRegisterPage = state.matchedLocation == RegisterScreen.routeName;
 
       if (auth.isLoading) return null;
 
-      if (token == null && !isLoginPage) return LoginScreen.routeName;
+      // Kalau belum login dan bukan di login/register → paksa ke login
+      if (token == null && !isLoginPage && !isRegisterPage) {
+        return LoginScreen.routeName;
+      }
 
-      if (token != null && isLoginPage) return HomeScreen.routeName;
+      // Kalau sudah login dan masih di login → ke home
+      if (token != null && isLoginPage) {
+        return HomeScreen.routeName;
+      }
+
+      return null;
     },
     routes: [
       GoRoute(path: HomeScreen.routeName, builder: (_, _) => const HomeScreen()),

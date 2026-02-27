@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sizer/sizer.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:wanderly/core/router/router.dart';
 import 'package:wanderly/core/theme/app_theme.dart';
 import 'package:wanderly/core/theme/theme_provider.dart';
-import 'package:wanderly/features/trip/data/trip_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  await Hive.initFlutter();
-  Hive.registerAdapter(TripAdapter());
+  
   runApp(const ProviderScope(
     child: MyApp()
   ));

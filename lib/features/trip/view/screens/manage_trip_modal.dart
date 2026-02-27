@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:wanderly/features/trip/data/trip_model.dart';
 import 'package:wanderly/core/utils/date_range_to_string_formatter.dart';
 import 'package:wanderly/core/utils/date_range_parser.dart';
@@ -40,7 +41,16 @@ class _AddTripModalState extends State<AddTripModal> {
   void submit() {
     if (titleController.text.isEmpty || selectedRange == null) return;
 
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not authenticated')),
+      );
+      return;
+    }
+
     final trip = Trip(
+      id: widget.trip?.id,
       title: titleController.text,
       date: dateRangeToStringFormatter(selectedRange!),
       imageUrl: widget.trip?.imageUrl ??
@@ -51,6 +61,7 @@ class _AddTripModalState extends State<AddTripModal> {
             'https://i.pravatar.cc/100?${Random().nextInt(10)}',
             'https://i.pravatar.cc/100?${Random().nextInt(10)}',
           ],
+      userId: currentUser.uid,
     );
 
     widget.onSubmit(trip);

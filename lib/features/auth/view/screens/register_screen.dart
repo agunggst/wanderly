@@ -37,6 +37,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final passwordController = TextEditingController();
   String passwordError = "";
 
+  bool _isLoading = false;
+
   bool formValidate() {
     nameError = "";
     emailError = "";
@@ -59,6 +61,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     if (passwordController.text.isEmpty) {
       passwordError = "Password is required";
+      return false;
+    }
+
+    if (passwordController.text.length < 6) {
+      passwordError = "Password must be at least 6 characters";
       return false;
     }
 
@@ -139,34 +146,50 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     SizedBox(height: Adaptive.sh(2)),
 
                     PrimaryButton(
-                      label: 'Create Account',
-                      onPressed: () {
+                      label: _isLoading ? 'Creating Account...' : 'Create Account',
+                      onPressed: _isLoading ? null : () async {
                         if (!formValidate()) {
                           setState(() {});
                           return;
                         }
 
-                        setState(() {});
+                        setState(() => _isLoading = true);
 
-                        // =========================
-                        // SIMULASI REGISTER SUCCESS
-                        // =========================
-                        const token = "token_from_register";
-
-                        // SET TOKEN KE RIVERPOD
-                        ref.read(authProvider.notifier).login(token);
-
-                        // set user
-                        ref.read(userProvider.notifier).setUser(
-                          User(
+                        try {
+                          // Register with Firebase
+                          await ref.read(authProvider.notifier).register(
                             email: emailController.text,
                             password: passwordController.text,
                             fullName: nameController.text,
-                          ),
-                        );
+                          );
 
-                        // NAVIGATE KE HOME
-                        context.go(HomeScreen.routeName);
+                          // Set user data
+                          ref.read(userProvider.notifier).setUser(
+                            User(
+                              email: emailController.text,
+                              password: passwordController.text,
+                              fullName: nameController.text,
+                            ),
+                          );
+
+                          // Navigate to home
+                          if (mounted) {
+                            context.go(HomeScreen.routeName);
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(e.toString()),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        } finally {
+                          if (mounted) {
+                            setState(() => _isLoading = false);
+                          }
+                        }
                       },
                     ),
 
